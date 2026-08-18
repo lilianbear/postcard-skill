@@ -1,98 +1,96 @@
-# vinext-starter
+Postcard Skill
 
-A clean full-stack starter running on
-[vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
-Drizzle support.
+将一张或多张照片重新创作为具有真实做旧质感的复古明信片正面，同时尽量保留原图中的主体、姿态、空间关系、透视和关键细节。
 
-## Prerequisites
+这个 Skill 不只是给照片叠加泛黄滤镜。它会从原图提取环境轮廓、方向节奏和代表性色彩，用这些信息重新设计复古海报背景、邮票图案、邮戳和印刷语言，让每张明信片都与原始场景有关，并减少批量生成时的模板重复感。
 
-- Node.js `>=22.13.0`
+## 主要特点
 
-## Quick Start
+- 保留人物、动物、建筑和自然景观的真实造型与关键细节
+- 根据照片内容选择不同的复古年代与印刷方式
+- 从原图生成专属邮票图案，而不是重复使用通用邮票模板
+- 使用原图中的山脊、海岸、步道、树冠、倒影或建筑轮廓延展海报背景
+- 同时表现纸张老化、印刷磨损和使用痕迹三种层次
+- 支持单张照片及批量系列，并主动变化构图、色彩、邮戳和做旧方式
+- 默认输出平整的明信片正面，不生成桌面摆拍或手持样机
+
+## 支持的复古方向
+
+- 1900 年代手工上色旅行明信片
+- 1930 年代石版印刷旅游海报
+- 1950 年代胶印照片明信片
+- 1960 年代丝网印刷场景卡片
+
+每张作品会根据原图的题材、光线、色彩和情绪选择合适的方向，而不是统一套用同一种米黄色模板。
+
+## 安装
+使用 Skill Installer
+
+在 Codex 中输入：
+
+```text
+请使用 $skill-installer 安装这个 Skill：
+https://github.com/lilianbear/postcard-skill
+```
+
+### 手动安装
 
 ```bash
-npm install
-npm run dev
-npm run build
+git clone https://github.com/lilianbear/postcard-skill.git ~/.codex/skills/postcard
 ```
 
-This starter does not use `wrangler.jsonc`.
+安装后重新启动 Codex，或重新打开一个任务，使 Skill 被重新发现。
 
-## Included Shape
+## 使用方法
 
-- edit site code under `app/`
-- `.openai/hosting.json` declares optional Sites D1 and R2 bindings
-- `vite.config.ts` simulates declared bindings for local development
-- `db/schema.ts` starts intentionally empty
-- `examples/d1/` contains an optional D1 example surface
-- `drizzle.config.ts` supports local migration generation when needed
+上传照片后调用：
 
-## Workspace Auth Headers
-
-OpenAI workspace sites can read the current user's email from
-`oai-authenticated-user-email`.
-
-SIWC-authenticated workspace sites may also receive
-`oai-authenticated-user-full-name` when the user's SIWC profile has a non-empty
-`name` claim. The full-name value is percent-encoded UTF-8 and is accompanied by
-`oai-authenticated-user-full-name-encoding: percent-encoded-utf-8`.
-
-Treat the full name as optional and fall back to email when it is absent:
-
-```tsx
-import { headers } from "next/headers";
-
-export default async function Home() {
-  const requestHeaders = await headers();
-  const email = requestHeaders.get("oai-authenticated-user-email");
-  const encodedFullName = requestHeaders.get("oai-authenticated-user-full-name");
-  const fullName =
-    encodedFullName &&
-    requestHeaders.get("oai-authenticated-user-full-name-encoding") ===
-      "percent-encoded-utf-8"
-      ? decodeURIComponent(encodedFullName)
-      : null;
-
-  const displayName = fullName ?? email;
-  // ...
-}
+```text
+用 $postcard 把这张照片制作成复古明信片，保留主体造型和原始环境特征。
 ```
 
-## Optional Dispatch-Owned ChatGPT Sign-In
+也可以指定方向：
+用 $postcard 将这张徒步照片制作成 1930 年代石版印刷旅游明信片。
+保留人物数量、行走姿态、石阶方向和森林层次，邮票图案从步道特征中提取。
+```
 
-Import the ready-to-use helpers from `app/chatgpt-auth.ts` when the site needs
-optional or required ChatGPT sign-in:
+批量生成示例：
 
-- Use `getChatGPTUser()` for optional signed-in UI.
-- Use `requireChatGPTUser(returnTo)` for server-rendered pages that should send
-  anonymous visitors through Sign in with ChatGPT.
-- Use `chatGPTSignInPath(returnTo)` and `chatGPTSignOutPath(returnTo)` for
-  browser links or actions.
-- Pass a same-origin relative `returnTo` path for the destination after sign-in
-  or sign-out. The helper validates and safely encodes it.
-- Mark protected pages with `export const dynamic = "force-dynamic"` because
-  they depend on per-request identity headers.
+```text
+用 $postcard 将这些照片制作成一组复古明信片。
+保持系列感，但让每张作品使用不同的邮票、版式、印刷方式和做旧痕迹。
+```
 
-Dispatch owns `/signin-with-chatgpt`, `/signout-with-chatgpt`, `/callback`, the
-OAuth cookies, and identity header injection. Do not implement app routes for
-those reserved paths. Routes that do not import and call the helper remain
-anonymous-compatible.
+## 设计原则
 
-SIWC establishes identity only; it does not prove workspace membership. Use the
-Sites hosting platform's access policy controls for workspace-wide restrictions,
-or enforce explicit server-side membership or allowlist checks.
+1. 原始照片是事实依据，不随意改变主体数量、身份、姿态、视线或透视。
+2. 背景至少延续两项来自原图的环境线索。
+3. 邮票必须取材于当前照片中具有辨识度的轮廓、关系或物体。
+4. 复古质感同时来自纸张、印刷和使用痕迹，而不是单一滤镜。
+5. 批量作品保持同一系列气质，但避免连续复用相同模板。
+   仓库结构
 
-Use SIWC for account pages, user-specific dashboards, saved records, and write
-actions tied to the current ChatGPT user. Leave public content anonymous.
+```text
+postcard-skill/
+├── SKILL.md
+├── agents/
+│   └── openai.yaml
+└── references/
+    ├── postcard-style.md
+    ├── source-derived-elements.md
+    └── vintage-directions.md
+```
 
-## Useful Commands
+`SKILL.md` 定义核心工作流程；`references/` 包含构图、做旧、邮票设计和复古年代选择规则；`agents/openai.yaml` 提供 Skill 的界面显示信息。
 
-- `npm run dev`: start local development
-- `npm run build`: verify the vinext build output
-- `npm test`: build the starter and verify its rendered loading skeleton
-- `npm run db:generate`: generate Drizzle migrations after schema changes
+## 调用提示
 
-## Learn More
+为了得到更稳定的结果，可以在请求中说明：
 
-- [vinext Documentation](https://github.com/cloudflare/vinext)
-- [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+- 想保留的主体或细节
+- 偏好的年代或印刷风格
+- 是否需要中文、英文或双语文字
+- 是否需要批量系列感
+- 是否只制作正面，或还需要背面地址区
+
+如果没有指定，Skill 会根据照片本身选择适合的复古方向和邮票设计。

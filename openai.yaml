@@ -1,0 +1,4 @@
+interface:
+  display_name: "Postcard"
+  short_description: "Create source-specific aged postcard posters and stamps"
+  default_prompt: "Use $postcard to turn my photos into varied aged postcard posters with source-derived stamps and backgrounds."
